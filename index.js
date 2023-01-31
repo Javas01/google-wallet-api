@@ -23,8 +23,11 @@ https
     console.log(`server is runing at port ${port}`)
   })
 
+app.get('/', async (req, res) => {
+  res.send('Hello World')
+})
+
 app.post('/wallet', async (req, res) => {
-  console.log('first')
   const newObject = {
     id: `${issuerId}.${req.body.id}`,
     classId: `${issuerId}.${classSuffix}`,
