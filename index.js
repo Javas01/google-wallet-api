@@ -7,7 +7,6 @@ const { DemoEventTicket } = require('./event-ticket')
 const ticket = new DemoEventTicket()
 
 const issuerId = '3388000000022193134'
-const classSuffix = 'reservation_class'
 
 app.get('/', async (req, res) => {
   res.send('Hello World')
@@ -17,7 +16,7 @@ app.post('/wallet', async (req, res) => {
   const reservation = req.body
   const newObject = {
     id: `${issuerId}.${reservation.id}`,
-    classId: `${issuerId}.${classSuffix}`,
+    classId: `${issuerId}.${reservation.airportCode}`,
     state: 'ACTIVE',
     textModulesData: [
       {
@@ -106,13 +105,17 @@ app.post('/wallet', async (req, res) => {
 
   const obj = await ticket.createObject(
     issuerId,
-    req.body.id,
+    reservation.id,
     newObject,
-    req.body
+    reservation
   )
   console.log('ticket object: ', obj)
 
-  const token = await ticket.createJwtExistingObjects(issuerId, req.body.id)
+  const token = await ticket.createJwtExistingObjects(
+    issuerId,
+    reservation.id,
+    reservation.airportCode
+  )
 
   res.json(token)
 })
