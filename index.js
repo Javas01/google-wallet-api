@@ -14,85 +14,94 @@ app.get('/', async (req, res) => {
 })
 
 app.post('/wallet', async (req, res) => {
+  const reservation = req.body
   const newObject = {
-    id: `${issuerId}.${req.body.id}`,
+    id: `${issuerId}.${reservation.id}`,
     classId: `${issuerId}.${classSuffix}`,
     state: 'ACTIVE',
     textModulesData: [
       {
-        header: 'Text module header',
-        body: 'Text module body',
-        id: 'TEXT_MODULE_ID'
-      }
-    ],
-    linksModuleData: {
-      uris: [
-        {
-          uri: 'http://maps.google.com/',
-          description: 'Link module URI description',
-          id: 'LINK_MODULE_URI_ID'
-        },
-        {
-          uri: 'tel:6505555555',
-          description: 'Link module tel description',
-          id: 'LINK_MODULE_TEL_ID'
-        }
-      ]
-    },
-    imageModulesData: [
+        header: 'Arrrival Date',
+        body: new Date(reservation.startDate).toLocaleDateString('en-us', {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric'
+        }),
+        id: 'arrivalDate'
+      },
       {
-        mainImage: {
-          sourceUri: {
-            uri: 'https://api.pnf.com:50443/PNF_Logo.jpg'
-          },
-          contentDescription: {
-            defaultValue: {
-              language: 'en-US',
-              value: 'Image module description'
-            }
-          }
-        },
-        id: 'IMAGE_MODULE_ID'
+        header: 'Arrrival Time',
+        body: new Date(reservation.startDate).toLocaleTimeString('en-US', {
+          hour: '2-digit',
+          minute: '2-digit'
+        }),
+        id: 'arrivalTime'
+      },
+      {
+        header: 'Exit Date',
+        body: new Date(reservation.endDate).toLocaleDateString('en-us', {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric'
+        }),
+        id: 'exitDate'
+      },
+      {
+        header: 'Exit Time',
+        body: new Date(reservation.endDate).toLocaleTimeString('en-US', {
+          hour: '2-digit',
+          minute: '2-digit'
+        }),
+        id: 'exitTime'
       }
     ],
     barcode: {
       type: 'QR_CODE',
       value: 'QR code'
     },
-    locations: [
-      {
-        latitude: 37.424015499999996,
-        longitude: -122.09259560000001
-      }
-    ],
     seatInfo: {
-      seat: {
+      section: {
         defaultValue: {
           language: 'en-US',
-          value: '42'
+          value: reservation.parkingType.name
         }
       },
       row: {
         defaultValue: {
           language: 'en-US',
-          value: 'G3'
+          value:
+            new Date(reservation.startDate).toLocaleDateString('en-us', {
+              month: 'short',
+              day: 'numeric'
+            }) +
+            ' at ' +
+            new Date(reservation.startDate).toLocaleTimeString('en-US', {
+              hour: '2-digit',
+              minute: '2-digit'
+            })
         }
       },
-      section: {
+      seat: {
         defaultValue: {
           language: 'en-US',
-          value: '55'
-        }
-      },
-      gate: {
-        defaultValue: {
-          language: 'en-US',
-          value: req.body.carparkName
+          value:
+            new Date(reservation.endDate).toLocaleDateString('en-us', {
+              month: 'short',
+              day: 'numeric'
+            }) +
+            ' at ' +
+            new Date(reservation.endDate).toLocaleTimeString('en-US', {
+              hour: '2-digit',
+              minute: '2-digit'
+            })
         }
       }
     },
-    ticketHolderName: 'Ticket holder name',
-    ticketNumber: req.body.confirmationNumber
+    reservationInfo: {
+      confirmationCode: reservation.confirmationNumber
+    }
   }
 
   const obj = await ticket.createObject(
