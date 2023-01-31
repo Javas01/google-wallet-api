@@ -1,27 +1,13 @@
-const https = require('https')
-const fs = require('file-system')
 const express = require('express')
 const app = express()
 app.use(express.json())
-const port = process.env.PORT || 3000
+const port = 3000
 const { DemoEventTicket } = require('./event-ticket')
 
 const ticket = new DemoEventTicket()
 
 const issuerId = '3388000000022193134'
 const classSuffix = 'reservation_class'
-
-https
-  .createServer(
-    {
-      key: fs.readFileSync('key.pem'),
-      cert: fs.readFileSync('cert.pem')
-    },
-    app
-  )
-  .listen(port, () => {
-    console.log(`server is runing at port ${port}`)
-  })
 
 app.get('/', async (req, res) => {
   res.send('Hello World')
@@ -120,4 +106,8 @@ app.post('/wallet', async (req, res) => {
   const token = await ticket.createJwtExistingObjects(issuerId, req.body.id)
 
   res.json(token)
+})
+
+app.listen(port, () => {
+  console.log(`Example app listening on port ${port}`)
 })
